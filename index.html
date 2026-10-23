@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Sejal • Chapter 19 Birthday Vault 🎂</title>
+  
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+
+  <style>
+    @layer base {
+      html, body {
+        margin: 0;
+        padding: 0;
+        scroll-behavior: smooth;
+      }
+      body {
+        overscroll-behavior: none;
+      }
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    .page-view {
+      display: none;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.35s ease-out, transform 0.35s ease-out;
+    }
+    .page-view.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .flame-active {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .flame-extinguished {
+      opacity: 0 !important;
+      transform: scale(0.2) translateY(-10px) !important;
+    }
+    .smoke-active {
+      display: block !important;
+      animation: smokeRise 1.4s ease-out forwards;
+    }
+    @keyframes smokeRise {
+      0% { opacity: 0.8; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-24px) scale(2.2); }
+    }
+    @keyframes tomatoSplatter {
+      0% { transform: scale(0.3) rotate(0deg); opacity: 0; }
+      50% { transform: scale(1.3) rotate(15deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0deg); opacity: 0; }
+    }
+    @keyframes spinVinyl {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .spinning-disc {
+      animation: spinVinyl 3.5s linear infinite;
+    }
+  </style>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-secondary-fixed-variant": "#6c3546",
+            "on-surface": "#1b1c1a",
+            "on-surface-variant": "#5c3f40",
+            "inverse-primary": "#ffb3b5",
+            "secondary-fixed": "#ffd9e1",
+            "surface-container-highest": "#e4e2de",
+            "on-secondary-fixed": "#370a1b",
+            "on-error-container": "#93000a",
+            "surface-container-lowest": "#ffffff",
+            "background": "#fbf9f5",
+            "inverse-on-surface": "#f2f0ed",
+            "surface-container-low": "#f5f3ef",
+            "surface-dim": "#dbdad6",
+            "on-tertiary-container": "#503d00",
+            "error": "#ba1a1a",
+            "on-tertiary-fixed-variant": "#584400",
+            "tertiary-fixed": "#ffdf90",
+            "surface-bright": "#fbf9f5",
+            "surface-tint": "#be0035",
+            "on-tertiary-fixed": "#241a00",
+            "surface-container-high": "#eae8e4",
+            "on-primary-fixed": "#40000b",
+            "secondary-container": "#fdb2c5",
+            "on-tertiary": "#ffffff",
+            "surface-variant": "#e4e2de",
+            "primary-fixed": "#ffdada",
+            "primary-container": "#de1b44",
+            "on-secondary-container": "#7a4151",
+            "outline-variant": "#e5bdbd",
+            "surface-container": "#efeeea",
+            "surface": "#fbf9f5",
+            "tertiary-container": "#d2a501",
+            "on-primary": "#ffffff",
+            "on-error": "#ffffff",
+            "primary-fixed-dim": "#ffb3b5",
+            "error-container": "#ffdad6",
+            "tertiary-fixed-dim": "#f0c12c",
+            "on-primary-container": "#fff6f5",
+            "secondary-fixed-dim": "#fdb2c5",
+            "outline": "#906f6f",
+            "on-secondary": "#ffffff",
+            "on-background": "#1b1c1a",
+            "secondary": "#884c5d",
+            "primary": "#b50032",
+            "inverse-surface": "#30312e",
+            "tertiary": "#755b00",
+            "on-primary-fixed-variant": "#920026"
+          },
+          borderRadius: {
+            DEFAULT: "1rem",
+            lg: "2rem",
+            xl: "3rem",
+            full: "9999px"
+          },
+          fontFamily: {
+            body: ["Plus Jakarta Sans", "sans-serif"],
+            display: ["Plus Jakarta Sans", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-background text-on-surface antialiased font-body relative min-h-screen pb-16 xl:pb-0">
+
+  <!-- PERSISTENT BACKGROUND AUDIO ELEMENT (Never restarts across views) -->
+  <audio id="birthday-audio" preload="auto" loop playsinline webkit-playsinline src="https://files.catbox.moe/g2irzu.mp3"></audio>
+
+  <!-- Interactive Confetti Canvas (Fixed Across All Pages) -->
+  <canvas class="pointer-events-none fixed inset-0 z-50 w-full h-full" id="confetti-canvas"></canvas>
+
+  <!-- Toast Shelf -->
+  <div class="fixed bottom-20 right-6 z-50 flex flex-col gap-2 pointer-events-none" id="toast-shelf"></div>
+
+  <!-- CUTE FLOATING MUSIC CONTROLLER (Always accessible on Mobile & Desktop) -->
+  <div class="fixed bottom-20 left-4 sm:bottom-6 sm:left-6 z-40 flex items-center">
+    <button id="floating-music-btn" onclick="toggleAudio()" class="group flex items-center gap-2.5 p-2 pr-4 rounded-full bg-surface-container-lowest/95 backdrop-blur-xl border border-secondary-container/60 shadow-[0_8px_25px_rgba(222,27,68,0.2)] hover:scale-105 active:scale-95 transition-all text-on-surface cursor-pointer" type="button" aria-label="Toggle background music">
+      <div id="vinyl-disc" class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary via-primary-container to-secondary-container flex items-center justify-center text-white shadow-md relative">
+        <span class="w-3.5 h-3.5 rounded-full bg-surface-container-lowest border-2 border-primary-container"></span>
+        <span class="absolute text-xs">🎵</span>
+      </div>
+      <div class="flex flex-col text-left">
+        <div class="flex items-center gap-1.5">
+          <span class="text-[11px] font-bold text-primary leading-tight">Birthday Music</span>
+          <div class="flex items-end gap-0.5 h-3 px-0.5" id="floating-eq">
+            <span class="w-0.5 h-1.5 bg-primary rounded-full transition-all"></span>
+            <span class="w-0.5 h-2.5 bg-primary-container rounded-full transition-all"></span>
+            <span class="w-0.5 h-1 bg-secondary-container rounded-full transition-all"></span>
+          </div>
+        </div>
+        <span id="floating-audio-status" class="text-[9px] text-on-surface-variant font-medium">Tap to Play 💖</span>
+      </div>
+    </button>
+  </div>
+
+  <!-- Shared Sticky Header -->
+  <header class="fixed top-0 w-full z-40 bg-surface/85 backdrop-blur-xl border-b border-outline-variant/20 shadow-[0_4px_20px_rgba(222,27,68,0.06)]">
+    <div class="h-20 max-w-[1200px] mx-auto px-4 sm:px-6 flex items-center justify-between gap-4">
+      <a class="flex items-center gap-2.5 group cursor-pointer" onclick="navigateTo('memory-vault')">
+        <span class="flex items-center justify-center w-10 h-10 rounded-full bg-secondary-fixed text-primary text-xl shadow-[0_2px_8px_rgba(222,27,68,0.15)] group-hover:rotate-12 transition-transform">🎀</span>
+        <span class="text-base sm:text-lg tracking-tight text-primary font-extrabold">SEJAL • CHAPTER 19 🎂</span>
+      </a>
+
+      <!-- Desktop Navigation Menu -->
+      <nav class="hidden xl:flex items-center gap-1.5 p-1.5 rounded-full bg-surface-container-low" id="main-nav">
+        <button class="nav-btn px-4 py-2 rounded-full text-sm font-semibold transition-all text-on-surface-variant hover:text-primary cursor-pointer" onclick="navigateTo('memory-vault')" data-target="memory-vault">Memory Vault</button>
+        <button class="nav-btn px-4 py-2 rounded-full text-sm font-semibold transition-all text-on-surface-variant hover:text-primary cursor-pointer" onclick="navigateTo('the-roast-zone')" data-target="the-roast-zone">The Roast Zone</button>
+        <button class="nav-btn px-4 py-2 rounded-full text-sm font-semibold transition-all text-on-surface-variant hover:text-primary cursor-pointer" onclick="navigateTo('candle-blowout-cake')" data-target="candle-blowout-cake">Candle Blowout Cake</button>
+        <button class="nav-btn px-4 py-2 rounded-full text-sm font-semibold transition-all text-on-surface-variant hover:text-primary cursor-pointer" onclick="navigateTo('secret-gift-and-wishes')" data-target="secret-gift-and-wishes">Secret Gift &amp; Wishes</button>
+      </nav>
+
+      <!-- Right Header Tools -->
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        <!-- Header Audio Button -->
+        <button aria-label="Play or pause birthday song" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-lowest shadow-[0_2px_12px_rgba(222,27,68,0.08)] border border-outline-variant/30 hover:bg-secondary-fixed/50 transition-all cursor-pointer" onclick="toggleAudio()" type="button">
+          <span class="material-symbols-outlined text-primary text-[18px]" id="header-audio-icon">play_arrow</span>
+          <div class="hidden sm:flex flex-col text-left">
+            <span class="text-[10px] text-primary uppercase font-bold leading-none" id="header-audio-label">Music</span>
+            <span class="text-[8px] text-on-surface-variant leading-none">Tap to toggle</span>
+          </div>
+          <div class="flex items-end gap-0.5 h-3 px-0.5" id="header-eq">
+            <span class="w-0.5 h-2 bg-primary-container rounded-full"></span>
+            <span class="w-0.5 h-3 bg-secondary-container rounded-full"></span>
+            <span class="w-0.5 h-1.5 bg-primary rounded-full"></span>
+          </div>
+        </button>
+
+        <!-- Pop Confetti Party Button -->
+        <button aria-label="Trigger birthday confetti celebration" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-secondary-fixed hover:bg-secondary-container text-on-secondary-fixed text-xs font-bold transition-all shadow-[0_2px_8px_rgba(222,27,68,0.12)] active:scale-95 cursor-pointer" onclick="burstConfetti()" type="button">
+          <span class="material-symbols-outlined text-primary text-[17px]">celebration</span>
+          <span class="hidden sm:inline">Party!</span>
+        </button>
+
+        <!-- Sejal's Profile Picture -->
+        <img alt="Sejal Profile" class="w-9 h-9 rounded-full object-cover ring-2 ring-primary/20 shadow-[0_2px_6px_rgba(56,36,42,0.1)]" src="https://lh3.googleusercontent.com/aida/AEtjO1Vqt1KE7tgGbUwv5SreHoKqLAvF0HR6dGVGx5IfYaHlp9mlPdRBcs8xpBV8k103UkSrDWQ20Jf9ofi_S0ZScaW7zNhC6I2OzZe_tmcI5ZRQTyji2jWVD4svv4t4pcoTpB_e7MtZTsKHM7nAoQjTCAPdlgbUsD3Z9Gt8SW0N2JZKuRECN0z6DRXashmpde0aoZ965j7evmCcWMzVWIIEm0EPbI0r5uiDPgtyED_fhGOIfLhVULfk_fPrARWM2nyn3NTMfYuV4qbNiA"/>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Bottom Floating Navigation Bar -->
+  <nav class="xl:hidden fixed bottom-3 left-1/2 -translate-x-1/2 z-40 bg-surface/90 backdrop-blur-xl border border-outline-variant/30 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] p-1.5 flex items-center gap-1 max-w-[94vw] overflow-x-auto">
+    <button class="mobile-nav-btn px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1 text-on-surface-variant whitespace-nowrap cursor-pointer" onclick="navigateTo('memory-vault')" data-target="memory-vault">
+      <span>📸</span> Vault
+    </button>
+    <button class="mobile-nav-btn px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1 text-on-surface-variant whitespace-nowrap cursor-pointer" onclick="navigateTo('the-roast-zone')" data-target="the-roast-zone">
+      <span>💀</span> Roast
+    </button>
+    <button class="mobile-nav-btn px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1 text-on-surface-variant whitespace-nowrap cursor-pointer" onclick="navigateTo('candle-blowout-cake')" data-target="candle-blowout-cake">
+      <span>🎂</span> Cake
+    </button>
+    <button class="mobile-nav-btn px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1 text-on-surface-variant whitespace-nowrap cursor-pointer" onclick="navigateTo('secret-gift-and-wishes')" data-target="secret-gift-and-wishes">
+      <span>💌</span> Wishes
+    </button>
+  </nav>
+
+  <!-- Main Multi-Page Container -->
+  <main class="w-full pt-20 bg-background overflow-hidden min-h-[calc(100vh-80px)]">
+
+    <!-- ================= PAGE 1: MEMORY VAULT ================= -->
+    <div class="page-view active" id="view-memory-vault">
+      <div class="flex flex-col w-full">
+        <!-- Hero Scrapbook Entrance Section -->
+        <section class="relative w-full px-4 sm:px-6 lg:px-8 max-w-[1200px] mx-auto py-10 lg:py-16">
+          <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[540px] h-[340px] sm:h-[460px] bg-secondary-fixed/40 blur-[90px] rounded-full pointer-events-none -z-10"></div>
+          
+          <div class="flex flex-col items-center text-center max-w-4xl mx-auto space-y-6">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary-fixed text-primary text-xs font-bold shadow-[0_2px_12px_rgba(222,27,68,0.12)]">
+              <span class="flex h-2 w-2 rounded-full bg-primary animate-ping"></span>
+              <span>THE OFFICIAL BIRTHDAY SCRAPBOOK &amp; VAULT ✨</span>
+            </div>
+
+            <div class="flex items-center justify-center gap-3">
+              <span class="h-[1px] w-8 sm:w-16 bg-outline-variant"></span>
+              <span class="text-xs sm:text-sm uppercase tracking-widest text-secondary font-extrabold">19TH NOVEMBER • ERA OF BRILLIANCE</span>
+              <span class="h-[1px] w-8 sm:w-16 bg-outline-variant"></span>
+            </div>
+
+            <h1 class="text-3xl sm:text-5xl lg:text-6xl text-primary font-extrabold tracking-tight leading-tight text-balance">
+              HAPPY 19TH BIRTHDAY, SEJAL! <span class="inline-block transform hover:rotate-12 transition-transform duration-300">🎂</span>
+            </h1>
+
+            <p class="text-base sm:text-lg text-on-surface-variant max-w-2xl leading-relaxed">
+              Entering chapter 19 with main character energy, iconic vibes, and non-stop laughter. Down since day one, iconic for a lifetime. Here’s your personal time-capsule, photo vault, and bestie hall of fame!
+            </p>
+
+            <div class="flex flex-wrap items-center justify-center gap-3.5 pt-2">
+              <button class="group flex items-center gap-2 px-6 py-3.5 rounded-full bg-primary-container text-on-primary-container font-bold text-sm shadow-[0_4px_16px_rgba(222,27,68,0.28)] hover:scale-105 active:scale-95 transition-all cursor-pointer" onclick="burstConfetti()" type="button">
+                <span class="material-symbols-outlined text-[20px] transition-transform group-hover:rotate-45">celebration</span>
+                <span>🎉 Pop Birthday Confetti</span>
+              </button>
+              <button class="group flex items-center gap-2 px-6 py-3.5 rounded-full bg-surface-container-lowest text-primary font-bold text-sm shadow-[0_4px_14px_rgba(56,36,42,0.08)] hover:bg-surface-container-low transition-all cursor-pointer" onclick="navigateTo('the-roast-zone')" type="button">
+                <span>Step into the Roast Zone</span>
+                <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1">arrow_forward</span>
+              </button>
+              <button class="flex items-center gap-2 px-5 py-3.5 rounded-full bg-secondary-fixed/70 hover:bg-secondary-fixed text-on-secondary-fixed-variant font-bold text-sm transition-colors cursor-pointer" onclick="document.getElementById('guestbook').scrollIntoView({behavior: 'smooth'})" type="button">
+                <span>💌 Drop a Birthday Note</span>
+              </button>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full pt-8">
+              <div class="flex flex-col items-center justify-center p-5 rounded-2xl bg-surface-container-lowest shadow-[0_8px_24px_-4px_rgba(222,27,68,0.06)] transform hover:-translate-y-1 transition-transform">
+                <span class="text-3xl mb-1">👑</span>
+                <span class="text-2xl font-extrabold text-primary">19 Years</span>
+                <span class="text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Undeniably Iconic</span>
+              </div>
+              <div class="flex flex-col items-center justify-center p-5 rounded-2xl bg-surface-container-lowest shadow-[0_8px_24px_-4px_rgba(222,27,68,0.06)] transform hover:-translate-y-1 transition-transform">
+                <span class="text-3xl mb-1">💄</span>
+                <span class="text-2xl font-extrabold text-primary">100%</span>
+                <span class="text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Unapologetic Diva</span>
+              </div>
+              <div class="flex flex-col items-center justify-center p-5 rounded-2xl bg-surface-container-lowest shadow-[0_8px_24px_-4px_rgba(222,27,68,0.06)] transform hover:-translate-y-1 transition-transform">
+                <span class="text-3xl mb-1">💅</span>
+                <span class="text-2xl font-extrabold text-primary">∞ Infinite</span>
+                <span class="text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Laughs &amp; Roasts</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Featured Audio Track Sticky Banner -->
+        <section class="w-full px-4 sm:px-6 lg:px-8 max-w-[1200px] mx-auto mb-12">
+          <div class="relative overflow-hidden p-6 sm:p-7 rounded-2xl bg-surface-container-lowest shadow-[0_10px_30px_rgba(222,27,68,0.08)] flex flex-col md:flex-row items-center justify-between gap-6 border border-outline-variant/20">
+            <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-secondary-fixed/50 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="flex items-center gap-4 w-full md:w-auto">
+              <div class="relative flex-shrink-0 w-16 h-16 rounded-2xl bg-primary-container text-on-primary-container flex items-center justify-center shadow-[0_4px_12px_rgba(222,27,68,0.25)]">
+                <span class="text-2xl">☕</span>
+                <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary-container opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                </span>
+              </div>
+              <div class="flex flex-col min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded-full bg-secondary-fixed text-primary text-[10px] uppercase font-extrabold">Soundtrack Of The Era</span>
+                  <span class="text-xs text-secondary font-semibold">Track #01</span>
+                </div>
+                <span class="text-lg sm:text-xl text-on-surface font-bold truncate">Espresso — Sabrina Carpenter</span>
+                <p class="text-xs sm:text-sm text-on-surface-variant italic">“Say you can't sleep, baby, I know... that's that me espresso! ☕💖”</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 w-full md:w-auto justify-end">
+              <div class="flex items-end gap-1 h-6 px-3" id="banner-eq">
+                <span class="w-1 h-3 bg-primary-container rounded-full"></span>
+                <span class="w-1 h-2 bg-secondary-container rounded-full"></span>
+                <span class="w-1 h-4 bg-primary rounded-full"></span>
+                <span class="w-1 h-2 bg-tertiary-container rounded-full"></span>
+                <span class="w-1 h-3 bg-primary-container rounded-full"></span>
+              </div>
+              <button class="flex items-center gap-2 px-4 py-2.5 rounded-full bg-primary text-on-primary text-xs font-bold shadow-[0_2px_8px_rgba(181,0,50,0.2)] hover:bg-primary-container transition-colors cursor-pointer" onclick="toggleAudio()" type="button">
+                <span class="material-symbols-outlined text-[16px]">volume_up</span>
+                <span id="audio-btn-label">Vibe Along</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Photo Scrapbook Showcase Section -->
+        <section class="w-full px-4 sm:px-6 lg:px-8 max-w-[1200px] mx-auto py-8">
+          <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
+            <div>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xl">📸</span>
+                <span class="text-xs sm:text-sm uppercase tracking-wider text-primary font-bold">The Authentic Scrapbook</span>
+              </div>
+              <h2 class="text-2xl sm:text-3xl text-on-surface font-extrabold tracking-tight">Captured Moments: Chapter 19 Vault</h2>
+            </div>
+            <span class="text-xs sm:text-sm text-on-surface-variant max-w-xs sm:text-right">Pinned straight from camera rolls, beach trips, museum dates, and candid snapshots.</span>
+          </div>
+
+          <!-- Polaroid Scrapbook Cards Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+            <!-- Polaroid 1: Beach Silhouette -->
+            <div class="group relative bg-surface-container-lowest p-3.5 pb-8 rounded-2xl shadow-[0_12px_28px_-6px_rgba(56,36,42,0.1)] transform md:-rotate-2 hover:rotate-0 hover:-translate-y-2 transition-all duration-300">
+              <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 w-28 h-6 bg-secondary-fixed/90 backdrop-blur-sm -rotate-3 rounded-sm shadow-sm pointer-events-none z-10 flex items-center justify-center">
+                <span class="text-[8px] text-primary tracking-widest uppercase font-bold">GOA DIARIES</span>
+              </div>
+              <div class="relative overflow-hidden rounded-xl aspect-[9/16] bg-surface-container-high mb-4">
+                <img alt="Sejal standing in sunshine by the beach waves with two peace signs raised" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBa8QPaYfbteVCJrnzQ9EXy68-GxB5KJKiqltryCGB9oifX4nmbB4M1c5YH4lmBNmajtm_3y5C8xkndAbI8OvKpmYWaIiwIzM7FfTtYKbLlWngUHoIQMYAsQJYbfztxd6fi0HvLg07f3LX-X1Pb7k6Xhlrf2ASisatokLk5J8erq2VBkUjHUHeOUQID3IeafIqkVXOik91IOqeaD9TKecdpq48GE_7aoLGKROJ2ScItoJUKsQftR2fYdbEYDlwnTHun8A"/>
+                <div class="absolute bottom-3 left-3">
+                  <span class="px-2.5 py-1 rounded-full bg-surface/90 backdrop-blur-md text-primary text-xs font-semibold shadow-sm">Goa Beach Glow 🏖️</span>
+                </div>
+              </div>
+              <div class="px-2 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-base sm:text-lg font-bold text-on-surface">Golden Hour Queen 🌅</h3>
+                  <span class="text-primary text-sm font-bold">01</span>
+                </div>
+                <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
+                  Celebrating under the sunshine with arms wide open! Pure beach bliss, sun-kissed hair, and unmatched aura.
+                </p>
+                <div class="pt-2 flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded-full bg-secondary-fixed/60 text-secondary text-xs font-medium">#MainCharacter</span>
+                  <span class="px-2 py-0.5 rounded-full bg-secondary-fixed/60 text-secondary text-xs font-medium">#SunsetChaser</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Polaroid 2: Museum / Astronaut Outfit -->
+            <div class="group relative bg-surface-container-lowest p-3.5 pb-8 rounded-2xl shadow-[0_12px_28px_-6px_rgba(56,36,42,0.1)] transform md:rotate-1 hover:rotate-0 hover:-translate-y-2 transition-all duration-300 md:mt-6">
+              <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 w-28 h-6 bg-tertiary-fixed/80 backdrop-blur-sm rotate-2 rounded-sm shadow-sm pointer-events-none z-10 flex items-center justify-center">
+                <span class="text-[8px] text-tertiary-container tracking-widest uppercase font-bold">MUSEUM DATE</span>
+              </div>
+              <div class="relative overflow-hidden rounded-xl aspect-[9/16] bg-surface-container-high mb-4">
+                <img alt="Sejal smiling in blue denim outfit next to astronaut statue" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXF_tQ2PmVEvC53i55lGx7t_20Wz5AwGzqjZL3jcpY72XQ7mfKWS-KuUTBriASsgI4dNjk8agJtyTrJdYwmgH7SHm6Mfpc9UAZwnOc_Xz90w3Lprc-Pd8xUvgdi-ufqIiN4fzKuhmwBxJ-IK-ffexIJarcUoZd8aXqSP18TaGOOk3NcS2ooYpztrJPc9sASiEZJ7-kkNySe2wdbGyub3NRWtTQ0l69VxyngICdiY8HvViyBxX2x4f-qTgnuTKAEYTaqg"/>
+                <div class="absolute bottom-3 left-3">
+                  <span class="px-2.5 py-1 rounded-full bg-surface/90 backdrop-blur-md text-primary text-xs font-semibold shadow-sm">Zero Gravity Icon 🚀</span>
+                </div>
+              </div>
+              <div class="px-2 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-base sm:text-lg font-bold text-on-surface">Shooting For The Stars 🚀</h3>
+                  <span class="text-primary text-sm font-bold">02</span>
+                </div>
+                <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
+                  Spreading bright smiles next to Rakesh Sharma! Denim on denim and out-of-this-world coolness.
+                </p>
+                <div class="pt-2 flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded-full bg-secondary-fixed/60 text-secondary text-xs font-medium">#AstroFashion</span>
+                  <span class="px-2 py-0.5 rounded-full bg-secondary-fixed/60 text-secondary text-xs font-medium">#CertifiedStargirl</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Polaroid 3: Signature Bestie Portrait -->
+            <div class="group relative bg-surface-container-lowest p-3.5 pb-8 rounded-2xl shadow-[0_12px_28px_-6px_rgba(56,36,42,0.1)] transform md:-rotate-1 hover:rotate-0 hover:-translate-y-2 transition-all duration-300">
+              <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 w-28 h-6 bg-secondary-fixed/90 backdrop-blur-sm -rotate-2 rounded-sm shadow-sm pointer-events-none z-10 flex items-center justify-center">
+                <span class="text-[8px] text-primary tracking-widest uppercase font-bold">SIGNATURE ERA</span>
+              </div>
+              <div class="relative overflow-hidden rounded-xl aspect-[9/16] bg-surface-container-high mb-4">
+                <img alt="Sejal signature selfie with glasses and bright smile" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida/AEtjO1Vqt1KE7tgGbUwv5SreHoKqLAvF0HR6dGVGx5IfYaHlp9mlPdRBcs8xpBV8k103UkSrDWQ20Jf9ofi_S0ZScaW7zNhC6I2OzZe_tmcI5ZRQTyji2jWVD4svv4t4pcoTpB_e7MtZTsKHM7nAoQjTCAPdlgbUsD3Z9Gt8SW0N2JZKuRECN0z6DRXashmpde0aoZ965j7evmCcWMzVWIIEm0EPbI0r5uiDPgtyED_fhGOIfLhVULfk_fPrARWM2nyn3NTMfYuV4qbNiA"/>
+                <div class="absolute bottom-3 left-3">
+                  <span class="px-2.5 py-1 rounded-full bg-surface/90 backdrop-blur-md text-primary text-xs font-semibold shadow-sm">Chapter 19 Lead 👑</span>
+                </div>
+              </div>
+              <div class="px-2 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-base sm:text-lg font-bold text-on-surface">The Birthday Girl ✨💅</h3>
+                  <span class="text-primary text-sm font-bold">03</span>
+                </div>
+                <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
+                  Glasses on, flawless energy loaded! Ready to take on 19 with all the sparkle, sass, and sweetness.
+                </p>
+                <div class="pt-2 flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded-full bg-secondary-fixed/60 text-secondary text-xs font-medium">#SejalChapter19</span>
+                  <span class="px-2 py-0.5 rounded-full bg-secondary-fixed/60 text-secondary text-xs font-medium">#BFFForever</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Guestbook Section -->
+        <section class="w-full px-4 sm:px-6 lg:px-8 max-w-[1200px] mx-auto py-12" id="guestbook">
+          <div class="rounded-3xl p-6 sm:p-10 bg-surface-container-low border border-outline-variant/30 flex flex-col gap-8 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <span class="text-xs uppercase font-extrabold tracking-widest text-primary">BESTIE WALL OF WISHES</span>
+                <h3 class="text-2xl sm:text-3xl font-extrabold text-on-surface">Leave Sejal a Birthday Note 💌</h3>
+              </div>
+              <span class="text-xs text-on-surface-variant">Pinned to Chapter 19 Vault</span>
+            </div>
+
+            <form class="flex flex-col sm:flex-row gap-3" onsubmit="addGuestNote(event)">
+              <input class="px-4 py-3 rounded-xl bg-surface-container-lowest border border-outline-variant/40 text-sm focus:outline-none focus:ring-2 focus:ring-primary flex-1" id="guest-name" placeholder="Your name (e.g. Bestie Simran)" required="" type="text"/>
+              <input class="px-4 py-3 rounded-xl bg-surface-container-lowest border border-outline-variant/40 text-sm focus:outline-none focus:ring-2 focus:ring-primary flex-[2]" id="guest-message" placeholder="Type a sweet or unhinged message..." required="" type="text"/>
+              <button class="px-6 py-3 rounded-xl bg-primary text-on-primary font-bold text-sm shadow hover:bg-primary-container transition-all cursor-pointer" type="submit">Pin Note 📌</button>
+            </form>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="notes-container">
+              <div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm border border-outline-variant/20 flex flex-col justify-between">
+                <p class="text-sm italic text-on-surface">“Happy 19th Sejalll! Keep shining and don't forget our shopping treat! 💖🛍️”</p>
+                <span class="text-xs text-primary font-bold mt-3">— Aisha K.</span>
+              </div>
+              <div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm border border-outline-variant/20 flex flex-col justify-between">
+                <p class="text-sm italic text-on-surface">“Still the most delulu and most loving friend anyone could ask for! 🐱✨”</p>
+                <span class="text-xs text-primary font-bold mt-3">— Rohan &amp; Crew</span>
+              </div>
+              <div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm border border-outline-variant/20 flex flex-col justify-between">
+                <p class="text-sm italic text-on-surface">“Kajukatli treat pending hai madam! Have the best 19th ever! 🍬🎉”</p>
+                <span class="text-xs text-primary font-bold mt-3">— Bestie Gang</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- ================= PAGE 2: THE ROAST ZONE ================= -->
+    <div class="page-view" id="view-the-roast-zone">
+      <div class="flex flex-col w-full">
+        <div class="relative w-full overflow-hidden">
+          <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[720px] h-[340px] bg-gradient-to-r from-secondary-fixed/40 via-secondary-container/30 to-tertiary-fixed/30 blur-3xl -z-10 rounded-full pointer-events-none"></div>
+          
+          <div class="max-w-[1200px] mx-auto px-4 sm:px-6 pt-6 pb-12 w-full flex flex-col gap-10">
+            <!-- Top Section Header -->
+            <section class="flex flex-col items-center text-center gap-4 max-w-3xl mx-auto">
+              <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary-fixed text-primary text-xs uppercase font-extrabold tracking-wider shadow-sm">
+                <span>🎀</span>
+                <span>UNFILTERED BESTIE ARCHIVES 🎀</span>
+              </div>
+              <h1 class="text-3xl sm:text-5xl text-primary font-extrabold tracking-tight">
+                The Official Roast Zone <span class="inline-block hover:rotate-12 transition-transform">💀✨</span>
+              </h1>
+              <p class="text-base sm:text-lg text-on-surface-variant max-w-2xl">
+                Because true best friends don't just send sweet cards—they bring receipts, iconic roasts, and top-tier meme culture.
+              </p>
+              <div class="flex flex-wrap items-center justify-center gap-2.5 pt-2">
+                <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container-lowest text-primary text-xs font-semibold shadow-sm border border-outline-variant/20">
+                  <span class="material-symbols-outlined text-[16px]">verified</span> Roasts Approved: 4/4
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container-lowest text-secondary text-xs font-semibold shadow-sm border border-outline-variant/20">
+                  <span class="material-symbols-outlined text-[16px]">local_fire_department</span> 100% Unhinged Energy
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container-lowest text-tertiary text-xs font-semibold shadow-sm border border-outline-variant/20">
+                  <span class="material-symbols-outlined text-[16px]">crown</span> Diva Level: 19/10
+                </span>
+              </div>
+            </section>
+
+            <!-- Interactive Bestie Roastometer Widget -->
+            <section class="w-full bg-surface-container-lowest/90 backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-sm border border-outline-variant/30">
+              <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div class="flex flex-col gap-1 max-w-xl">
+                  <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary-container text-[24px]">warning</span>
+                    <span class="text-lg sm:text-xl text-primary font-bold">Bestie Roastometer Meter</span>
+                  </div>
+                  <p class="text-xs sm:text-sm text-on-surface-variant">
+                    Emotional Damage Calibration: Keep an eye on Sejal's ego threshold before Chapter 19 explodes.
+                  </p>
+                </div>
+                <!-- Slider + Actions -->
+                <div class="w-full md:w-auto flex-1 max-w-md flex flex-col gap-3">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs text-on-surface-variant uppercase font-semibold">Damage Index</span>
+                    <span class="text-xl font-bold text-primary-container" id="roastometer-value">88%</span>
+                  </div>
+                  <div class="relative w-full h-4 rounded-full bg-surface-container overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-secondary-container via-primary-container to-primary rounded-full transition-all duration-300" id="roastometer-bar" style="width: 88%;"></div>
+                  </div>
+                  <div class="flex items-center justify-between gap-3 pt-1">
+                    <span class="text-xs text-on-surface-variant font-medium">Mild Kidding 🍰</span>
+                    <button class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-container text-on-primary-container text-xs font-bold hover:bg-primary transition-all active:scale-95 shadow-sm cursor-pointer" onclick="throwTomato()" type="button">
+                      <span>🍅</span>
+                      <span>Throw Tomato</span>
+                    </button>
+                    <span class="text-xs text-on-surface-variant font-medium">Emotional Ruin 💀</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- The 4 Classic Meme Roast Cards Grid -->
+            <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
+              <!-- Roast #1 -->
+              <article class="group relative flex flex-col sm:flex-row bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-outline-variant/20">
+                <div class="sm:w-1/2 relative bg-surface-container-low flex items-center justify-center p-6 overflow-hidden">
+                  <div class="relative w-full aspect-square rounded-xl overflow-hidden shadow-sm group-hover:scale-105 transition-transform duration-300">
+                    <img alt="Meme: Delulu Manifestation cat" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC23J95N_kXASokZ_6R56k0GytAXloisjP1TRnM108d8L0_wWyMp0xrpInYwLOeHW2Gy00eZYeWzqOp7Dd_1M8wbSeQBOIQ-lpa4nGtX8XXZnyqhXCsw2trQKvx0Bsp-W4OqU4DDMc1IURirnJekf8OqYFY2f0XO78Ja2-QKGjxt028tmrXU2wWpz-AU0a9fvBtW-LxhxddxSl6bbN74ydjubMgwhd4gbIKpfJhWyOGgHLEuRH54n1jaWfo51a_av_01A"/>
+                  </div>
+                  <span class="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-surface-container-lowest/90 text-xs font-bold text-primary backdrop-blur-sm">ROAST #1</span>
+                </div>
+                <div class="sm:w-1/2 p-6 flex flex-col justify-between gap-4">
+                  <div class="flex flex-col gap-2">
+                    <div class="inline-flex items-center w-fit px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed text-[11px] font-bold uppercase">
+                      DELULU MANIFESTATION
+                    </div>
+                    <h2 class="text-lg font-bold text-primary leading-snug">The Delulu Manifestation ✨🐱</h2>
+                    <blockquote class="p-3 rounded-xl bg-surface-container-low text-xs sm:text-sm text-on-surface italic">
+                      “May all your delulu become trululu. HAPPY BIRTHDAY!”
+                    </blockquote>
+                    <p class="text-xs text-on-surface-variant">
+                      Manifesting your dream life at 19, one unhinged wish at a time. Reality is just a suggestion anyway bestie!
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-between pt-2">
+                    <button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container hover:bg-secondary-fixed text-on-surface-variant hover:text-primary transition-colors text-xs font-semibold cursor-pointer" onclick="likeRoast(this)" type="button">
+                      <span class="material-symbols-outlined text-[16px]">favorite</span>
+                      <span class="like-count">142</span>
+                    </button>
+                    <span class="text-xs text-outline font-medium">Cat Coven Approved 🪄</span>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Roast #2 -->
+              <article class="group relative flex flex-col sm:flex-row bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-outline-variant/20">
+                <div class="sm:w-1/2 relative bg-surface-container-low flex items-center justify-center p-6 overflow-hidden">
+                  <div class="relative w-full aspect-square rounded-xl overflow-hidden shadow-sm group-hover:scale-105 transition-transform duration-300">
+                    <img alt="Meme: Thoughtful brain gift illustration" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3sBPFFKN5xG7TNGKaWPH5GPmsqzl7olWpJ0LR7xhKYUNom3e8xPkDroPBf6crsU_WePdCL-enFp0upis0b3LHkrbA5grWzhThXEIOwjXd872B9fj-A8EuuA2L9YyaQ6EOJ8Q7Fww0vYtbvxonIDlJvHu7td5QydQ52hf9RqiGAgsFb2UnFep3DSinBSJxkXTIORitPIdnyddwkBvw1BITCmxkpWXuOMk01bMEnPL5Pul88gjvT7XCA8-zPZEPhH7YzQ"/>
+                  </div>
+                  <span class="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-surface-container-lowest/90 text-xs font-bold text-primary-container backdrop-blur-sm">ROAST #2</span>
+                </div>
+                <div class="sm:w-1/2 p-6 flex flex-col justify-between gap-4">
+                  <div class="flex flex-col gap-2">
+                    <div class="inline-flex items-center w-fit px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container text-[11px] font-bold uppercase">
+                      THOUGHTFUL DONATION
+                    </div>
+                    <h2 class="text-lg font-bold text-primary leading-snug">The Most Thoughtful Gift 🧠🎁</h2>
+                    <blockquote class="p-3 rounded-xl bg-surface-container-low text-xs sm:text-sm text-on-surface italic">
+                      “I didn't know what to get for you because you already have a lot so, I bought you a thing that you don't have... [brain] Here is your gift ❤️😂”
+                    </blockquote>
+                    <p class="text-xs text-on-surface-variant">
+                      You're welcome bestie, sharing is caring! Don't let all those extra brain cells overwhelm Chapter 19.
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-between pt-2">
+                    <button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container hover:bg-secondary-fixed text-on-surface-variant hover:text-primary transition-colors text-xs font-semibold cursor-pointer" onclick="likeRoast(this)" type="button">
+                      <span class="material-symbols-outlined text-[16px]">favorite</span>
+                      <span class="like-count">389</span>
+                    </button>
+                    <span class="text-xs text-outline font-medium">Emotional Damage 100 💀</span>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Roast #3 -->
+              <article class="group relative flex flex-col sm:flex-row bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-outline-variant/20">
+                <div class="sm:w-1/2 relative bg-surface-container-low flex items-center justify-center p-6 overflow-hidden">
+                  <div class="relative w-full aspect-square rounded-xl overflow-hidden shadow-sm group-hover:scale-105 transition-transform duration-300">
+                    <img alt="Meme: Desi Shayari Alert" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4PCgtji_gIRWGBBusqnJRhZ9eQrNYQjItJ05y_QcrozH-J09ApGYeLY6OFNa8tHx-kFMdhEJCqmysizneTccMGAJoJmeObXsIFzeLxJ_7Zg-NWTJrpu1af7enx9M8wbYlgIvz0rzKzwBfpTuem2p9Gxv4BA4J0wrPWH9Xn_u69UThnI1cfbczL6F5NB9pk1SYXOm0XW-yEHRRkezX2QJEWst_e7ylSCp4Dehyh2gQFX-XTjT-PZhKV_r8cGD0Vsm_Lw"/>
+                  </div>
+                  <span class="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-surface-container-lowest/90 text-xs font-bold text-tertiary backdrop-blur-sm">ROAST #3</span>
+                </div>
+                <div class="sm:w-1/2 p-6 flex flex-col justify-between gap-4">
+                  <div class="flex flex-col gap-2">
+                    <div class="inline-flex items-center w-fit px-2.5 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed text-[11px] font-bold uppercase">
+                      DESI SHAYARI ALERT
+                    </div>
+                    <h2 class="text-lg font-bold text-primary leading-snug">Pure Poetic Genius 🍬🔥</h2>
+                    <blockquote class="p-3 rounded-xl bg-surface-container-low text-xs sm:text-sm text-on-surface italic">
+                      “Cake pe lagi mombatti fukne ka nahi, meri kajukatli ka b'day h bhulne ka nahi &gt;3”
+                    </blockquote>
+                    <p class="text-xs text-on-surface-variant">
+                      Certified national anthem for Sejal's 19th birthday party! Irshad irshad, sweet as diamond kaju sweets.
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-between pt-2">
+                    <button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container hover:bg-secondary-fixed text-on-surface-variant hover:text-primary transition-colors text-xs font-semibold cursor-pointer" onclick="likeRoast(this)" type="button">
+                      <span class="material-symbols-outlined text-[16px]">favorite</span>
+                      <span class="like-count">512</span>
+                    </button>
+                    <span class="text-xs text-outline font-medium">Wah Wah 👏✨</span>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Roast #4 -->
+              <article class="group relative flex flex-col sm:flex-row bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-outline-variant/20">
+                <div class="sm:w-1/2 relative bg-surface-container-low flex items-center justify-center p-6 overflow-hidden">
+                  <div class="relative w-full aspect-square rounded-xl bg-gradient-to-br from-secondary-fixed via-primary-fixed to-secondary-container flex flex-col items-center justify-center p-4 text-center group-hover:scale-105 transition-transform duration-300 shadow-sm">
+                    <span class="text-5xl mb-2">🚗⏰</span>
+                    <span class="font-extrabold text-primary text-sm">“On my way!”</span>
+                    <span class="text-[10px] text-on-secondary-fixed-variant mt-1 italic">(Still in bed wrapping herself like a burrito)</span>
+                  </div>
+                  <span class="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-surface-container-lowest/90 text-xs font-bold text-secondary backdrop-blur-sm">ROAST #4</span>
+                </div>
+                <div class="sm:w-1/2 p-6 flex flex-col justify-between gap-4">
+                  <div class="flex flex-col gap-2">
+                    <div class="inline-flex items-center w-fit px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed text-[11px] font-bold uppercase">
+                      LATE ATTENDANCE RECORD
+                    </div>
+                    <h2 class="text-lg font-bold text-primary leading-snug">The 5-Minute Illusion ⏱️💅</h2>
+                    <blockquote class="p-3 rounded-xl bg-surface-container-low text-xs sm:text-sm text-on-surface italic">
+                      “I'm stepping out right now bestie!” — sent 45 mins before actually picking an outfit.
+                    </blockquote>
+                    <p class="text-xs text-on-surface-variant">
+                      Sejal Standard Time (SST) is an official timezone in our friendship. Queens are never late, others are just early!
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-between pt-2">
+                    <button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container hover:bg-secondary-fixed text-on-surface-variant hover:text-primary transition-colors text-xs font-semibold cursor-pointer" onclick="likeRoast(this)" type="button">
+                      <span class="material-symbols-outlined text-[16px]">favorite</span>
+                      <span class="like-count">640</span>
+                    </button>
+                    <span class="text-xs text-outline font-medium">Certified IST (Iconic Sejal Time)</span>
+                  </div>
+                </div>
+              </article>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= PAGE 3: CANDLE BLOWOUT CAKE ================= -->
+    <div class="page-view" id="view-candle-blowout-cake">
+      <section class="relative w-full max-w-[1200px] mx-auto px-4 sm:px-6 py-6 sm:py-10 flex flex-col items-center">
+        <!-- Ambient Rose Glows -->
+        <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-secondary-fixed/30 rounded-full blur-3xl pointer-events-none -z-10"></div>
+        <div class="absolute top-48 left-1/2 -translate-x-1/2 w-[500px] h-[400px] bg-primary-fixed/25 rounded-full blur-2xl pointer-events-none -z-10"></div>
+
+        <!-- Header Block -->
+        <div class="flex flex-col items-center text-center max-w-3xl mx-auto space-y-3">
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary-fixed text-on-secondary-fixed shadow-sm">
+            <span class="text-primary text-sm animate-bounce">✨</span>
+            <span class="text-xs uppercase tracking-wider text-primary font-bold">Sejal's 19th Ceremony</span>
+            <span class="text-primary text-sm animate-bounce">✨</span>
+          </div>
+          <h1 class="text-3xl sm:text-5xl text-primary font-extrabold tracking-tight drop-shadow-sm">
+            Make a 19th Birthday Wish! 🎂🕯️
+          </h1>
+          <p class="text-base sm:text-lg text-on-surface-variant max-w-2xl">
+            Tap each candle to blow it out one by one, or click the grand button below to blow out all 19 candles simultaneously and unlock Sejal's Chapter 19 blessing!
+          </p>
+        </div>
+
+        <!-- Flavor Picker Pills -->
+        <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <button class="flavor-btn px-5 py-2 rounded-full text-xs font-bold transition-all shadow-sm flex items-center gap-2 bg-primary-container text-on-primary-container scale-105" id="flavor-berry" onclick="setCakeFlavor('berry')" type="button">
+            <span>🍓</span> Vanilla &amp; Wild Berry
+          </button>
+          <button class="flavor-btn px-5 py-2 rounded-full text-xs font-bold transition-all shadow-sm flex items-center gap-2 bg-surface-container-high text-on-surface-variant hover:bg-secondary-fixed" id="flavor-velvet" onclick="setCakeFlavor('velvet')" type="button">
+            <span>🍒</span> Red Velvet Cherry
+          </button>
+          <button class="flavor-btn px-5 py-2 rounded-full text-xs font-bold transition-all shadow-sm flex items-center gap-2 bg-surface-container-high text-on-surface-variant hover:bg-secondary-fixed" id="flavor-mocha" onclick="setCakeFlavor('mocha')" type="button">
+            <span>☕</span> Espresso Mocha
+          </button>
+        </div>
+
+        <!-- Metrics Bar -->
+        <div class="mt-8 w-full max-w-2xl bg-surface-container-lowest/80 backdrop-blur-md rounded-2xl p-4 shadow-md flex flex-wrap items-center justify-between gap-4 border border-outline-variant/30">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center text-primary">
+              <span class="material-symbols-outlined text-[22px]">mode_fan</span>
+            </div>
+            <div class="flex flex-col text-left">
+              <span class="text-xs text-on-surface-variant uppercase font-semibold">Candle Ceremony</span>
+              <span class="text-lg font-extrabold text-primary" id="candle-count-text">0 of 19 Blown Out</span>
+            </div>
+          </div>
+
+          <div class="flex-1 min-w-[140px] max-w-[220px] h-3 bg-surface-container rounded-full overflow-hidden p-0.5">
+            <div class="h-full bg-gradient-to-r from-primary to-primary-container rounded-full transition-all duration-300 w-0" id="candle-progress-fill"></div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="flex flex-col text-right">
+              <span class="text-xs text-on-surface-variant uppercase font-semibold">Virtual Treat</span>
+              <span class="text-lg font-extrabold text-tertiary" id="slices-counter">42 Slices cut</span>
+            </div>
+            <button class="px-3.5 py-2 rounded-full bg-secondary-fixed hover:bg-secondary-container text-primary text-xs font-bold transition-transform active:scale-95 flex items-center gap-1 shadow-sm cursor-pointer" onclick="cutSlice()" type="button">
+              <span>🍰</span> + Cut Slice
+            </button>
+          </div>
+        </div>
+
+        <!-- GRAND CENTERPIECE: 19 CANDLES & THE GRAND TIERED CAKE -->
+        <div class="relative w-full max-w-2xl mt-12 mb-8 flex flex-col items-center">
+          
+          <!-- Golden Banner Crown -->
+          <div class="z-30 -mb-3 flex flex-col items-center animate-pulse">
+            <div class="px-6 py-2 rounded-full bg-gradient-to-r from-tertiary-fixed via-tertiary-container to-tertiary-fixed text-on-tertiary-container text-sm sm:text-base font-extrabold shadow-lg flex items-center gap-2 transform -rotate-1">
+              <span>👑</span>
+              <span class="tracking-wide">SEJAL 19 • THE ICONIC ERA</span>
+              <span>✨</span>
+            </div>
+            <div class="w-1 h-5 bg-tertiary-container"></div>
+          </div>
+
+          <!-- 19 Interactive Candle Row Container -->
+          <div class="z-20 w-full px-4 flex items-end justify-center gap-1 sm:gap-2 -mb-2 relative" id="candles-row">
+            <!-- Populated via script -->
+          </div>
+
+          <!-- Tier 1 (Top Tier) -->
+          <div class="relative z-10 w-64 sm:w-80 h-20 rounded-t-2xl bg-secondary-fixed flex flex-col items-center justify-center shadow-lg border-b-4 border-primary-container/20 cake-tier" id="cake-tier-1">
+            <div class="absolute -top-2 inset-x-0 h-4 bg-secondary-container rounded-t-2xl flex justify-around px-2">
+              <span class="w-3 h-3 bg-secondary-fixed rounded-full -mt-1"></span>
+              <span class="w-3 h-3 bg-secondary-fixed rounded-full -mt-1"></span>
+              <span class="w-3 h-3 bg-secondary-fixed rounded-full -mt-1"></span>
+              <span class="w-3 h-3 bg-secondary-fixed rounded-full -mt-1"></span>
+              <span class="w-3 h-3 bg-secondary-fixed rounded-full -mt-1"></span>
+            </div>
+            <span class="text-xs sm:text-sm font-extrabold text-primary tracking-widest uppercase">Chapter 19 Queen</span>
+            <div class="flex gap-1 mt-1 text-xs">🍓 🍒 🍓 🍒</div>
+          </div>
+
+          <!-- Tier 2 (Middle Tier) -->
+          <div class="relative w-80 sm:w-96 h-24 rounded-t-2xl bg-secondary-container flex flex-col items-center justify-center shadow-xl border-b-4 border-primary/20 cake-tier" id="cake-tier-2">
+            <div class="absolute -top-2 inset-x-0 h-4 bg-primary-container/30 rounded-t-2xl flex justify-around px-4">
+              <span class="w-3 h-4 bg-secondary-container rounded-full"></span>
+              <span class="w-3 h-5 bg-secondary-container rounded-full"></span>
+              <span class="w-3 h-3 bg-secondary-container rounded-full"></span>
+              <span class="w-3 h-5 bg-secondary-container rounded-full"></span>
+            </div>
+            <span class="text-base sm:text-lg font-extrabold text-on-secondary-container tracking-wide">HAPPY BIRTHDAY SEJAL</span>
+            <span class="text-xs text-primary font-semibold">19 Fabulous Years ✨</span>
+          </div>
+
+          <!-- Tier 3 (Bottom Tier Base) -->
+          <div class="relative w-[340px] sm:w-[460px] h-28 rounded-t-3xl bg-secondary-fixed-dim flex flex-col items-center justify-center shadow-2xl cake-tier" id="cake-tier-3">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">💖</span>
+              <span class="text-sm sm:text-base font-extrabold text-primary uppercase tracking-widest">Iconic • Sweet • Unstoppable</span>
+              <span class="text-2xl">💖</span>
+            </div>
+          </div>
+
+          <!-- Cake Stand Base -->
+          <div class="w-[380px] sm:w-[500px] h-6 bg-surface-container-highest rounded-full shadow-md flex items-center justify-center">
+            <div class="w-48 h-3 bg-secondary-fixed rounded-full"></div>
+          </div>
+          <div class="w-32 h-6 bg-surface-container-high rounded-b-xl shadow-md"></div>
+        </div>
+
+        <!-- Grand Blow All Candles Action -->
+        <div class="flex flex-wrap items-center justify-center gap-4 mt-4">
+          <button class="px-8 py-4 rounded-full bg-primary-container text-on-primary-container font-extrabold text-base sm:text-lg shadow-xl shadow-primary-container/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-3 cursor-pointer" onclick="blowAllCandles()" type="button">
+            <span class="material-symbols-outlined text-[26px]">air</span>
+            <span>💨 Blow Out All 19 Candles!</span>
+          </button>
+          <button class="px-6 py-4 rounded-full bg-surface-container-lowest text-primary font-bold text-sm shadow-md hover:bg-surface-container-low transition-all cursor-pointer" onclick="resetCandles()" type="button">
+            <span>🔥 Relight Candles</span>
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <!-- ================= PAGE 4: SECRET GIFT & WISHES ================= -->
+    <div class="page-view" id="view-secret-gift-and-wishes">
+      <div class="max-w-[1200px] mx-auto px-4 sm:px-6 py-8 w-full flex flex-col gap-10">
+        <!-- Section 1: Hero Header -->
+        <section class="flex flex-col items-center text-center gap-4 relative">
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary-fixed text-on-secondary-fixed shadow-sm">
+            <span class="material-symbols-outlined text-[16px] text-primary">mail_lock</span>
+            <span class="text-xs uppercase font-extrabold tracking-wider text-primary">💌 SECRET VAULT • VAULT #19</span>
+          </div>
+          <div class="flex flex-col gap-2 max-w-3xl">
+            <h1 class="text-3xl sm:text-5xl text-primary font-extrabold tracking-tight drop-shadow-sm">
+              From Besties with Love ❤️💌
+            </h1>
+            <p class="text-base sm:text-lg text-on-surface-variant max-w-2xl mx-auto">
+              A 19th birthday keepsake crafted especially for Sejal. Unfold your gift, read the letter, and celebrate Chapter 19!
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-center gap-2.5 pt-1">
+            <span class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container text-secondary text-xs font-semibold shadow-sm border border-outline-variant/20">
+              <span class="material-symbols-outlined text-primary text-[14px]">verified</span> VIP Access
+            </span>
+            <span class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-secondary-container text-on-secondary-container text-xs font-semibold shadow-sm">
+              <span class="material-symbols-outlined text-primary text-[14px]">auto_awesome</span> Sweet 19 Edition
+            </span>
+            <span class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed text-xs font-semibold shadow-sm">
+              <span class="material-symbols-outlined text-tertiary text-[14px]">local_fire_department</span> 100% Love &amp; Chaos
+            </span>
+          </div>
+        </section>
+
+        <!-- Section 2: Two-Column Showcase -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <!-- Left Column: The Golden Mystery Parcel -->
+          <div class="lg:col-span-5 flex flex-col gap-6">
+            <div class="relative rounded-3xl p-8 bg-surface-container-low shadow-xl flex flex-col items-center text-center gap-6 overflow-hidden border border-outline-variant/30">
+              <div class="absolute -top-12 -right-12 w-48 h-48 bg-secondary-container/40 rounded-full blur-3xl pointer-events-none"></div>
+              <div class="absolute -bottom-10 -left-10 w-44 h-44 bg-tertiary-fixed/30 rounded-full blur-2xl pointer-events-none"></div>
+
+              <div class="flex items-center justify-between w-full">
+                <span class="px-3 py-1 rounded-full bg-surface-container-lowest text-[10px] text-primary uppercase font-bold tracking-wider shadow-sm">
+                  SEAL NO. 19-BFF
+                </span>
+                <div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-xs shadow-md">👑</div>
+              </div>
+
+              <!-- Parcel Box Element -->
+              <div class="relative my-2 flex items-center justify-center group cursor-pointer" onclick="openGiftModal()">
+                <div class="w-44 h-44 rounded-2xl bg-tertiary-fixed shadow-xl flex flex-col items-center justify-center relative transform group-hover:scale-105 transition-all duration-300">
+                  <div class="absolute inset-y-0 w-8 bg-primary-container/80 shadow-inner"></div>
+                  <div class="absolute inset-x-0 h-8 bg-primary-container/80 shadow-inner"></div>
+                  <div class="relative z-10 w-16 h-16 rounded-full bg-primary-container text-on-primary-container flex flex-col items-center justify-center shadow-lg transform group-hover:rotate-12 transition-transform">
+                    <span class="text-xl font-extrabold leading-none">19</span>
+                    <span class="text-[8px] uppercase tracking-widest text-on-primary-container/90">KEEPSAKE</span>
+                  </div>
+                  <span class="absolute -top-3 -right-3 text-2xl animate-bounce">✨</span>
+                  <span class="absolute -bottom-2 -left-2 text-xl">🎀</span>
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <h2 class="text-xl font-extrabold text-on-surface">The Golden Parcel</h2>
+                <p class="text-xs sm:text-sm text-on-surface-variant">
+                  Specially packaged with golden foil, satin ribbons, and a secret VIP contract reserved solely for the birthday queen.
+                </p>
+              </div>
+
+              <button class="w-full py-4 px-6 rounded-full bg-primary-container hover:bg-primary text-on-primary font-bold text-sm transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg shadow-primary-container/20 flex items-center justify-center gap-2 cursor-pointer" onclick="openGiftModal()" type="button">
+                <span class="material-symbols-outlined text-[20px]">redeem</span>
+                <span>Tap to unwrap Sejal's VIP Gift 🎁</span>
+              </button>
+            </div>
+
+            <!-- Mini Player Card -->
+            <div class="rounded-2xl p-5 bg-surface-container-lowest shadow-md flex items-center justify-between gap-4 border border-outline-variant/30">
+              <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-xl bg-secondary-fixed text-primary flex items-center justify-center shadow-sm">
+                  <span class="material-symbols-outlined text-[24px]">music_note</span>
+                </div>
+                <div class="flex flex-col text-left">
+                  <span class="text-[10px] text-primary uppercase font-bold tracking-wide">Birthday Anthem</span>
+                  <span class="text-base font-bold text-on-surface leading-tight">Espresso</span>
+                  <span class="text-xs text-on-surface-variant">Sabrina Carpenter</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="flex items-end gap-1 h-6 px-1" id="card-eq">
+                  <span class="w-1 h-3 bg-primary-container rounded-full"></span>
+                  <span class="w-1 h-2 bg-secondary-container rounded-full"></span>
+                  <span class="w-1 h-4 bg-primary rounded-full"></span>
+                </div>
+                <button aria-label="Play or Pause Anthem" class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shadow-md hover:bg-primary transition-colors cursor-pointer" onclick="toggleAudio()" type="button">
+                  <span class="material-symbols-outlined text-[20px]" id="mini-audio-icon">play_arrow</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Certified Bestie Keepsake Letter -->
+          <div class="lg:col-span-7 flex flex-col">
+            <div class="rounded-3xl p-6 sm:p-10 bg-surface-container-lowest shadow-xl flex flex-col gap-6 relative overflow-hidden border border-outline-variant/30">
+              <div class="absolute top-0 right-10 w-20 h-8 bg-secondary-container/40 rounded-b-lg flex items-center justify-center">
+                <span class="text-[10px] text-on-secondary-container font-extrabold tracking-wider">OFFICIAL</span>
+              </div>
+
+              <!-- Header Inside Letter -->
+              <div class="flex items-center justify-between pb-2">
+                <div class="flex items-center gap-3">
+                  <div class="w-14 h-14 rounded-full bg-secondary-fixed text-primary flex items-center justify-center shadow-md">
+                    <span class="text-2xl font-extrabold">S</span>
+                  </div>
+                  <div class="flex flex-col text-left">
+                    <span class="text-[10px] text-secondary uppercase font-extrabold tracking-widest">CHAPTER 19 KEEPSAKE</span>
+                    <h3 class="text-xl sm:text-2xl font-extrabold text-on-surface">Certified Bestie Dossier</h3>
+                  </div>
+                </div>
+                <div class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed text-xs font-semibold shadow-sm">
+                  <span class="material-symbols-outlined text-[14px]">hotel_class</span>
+                  <span>Forever Bond</span>
+                </div>
+              </div>
+
+              <!-- Hindi/Hinglish Verbatim Letter Body -->
+              <div class="rounded-2xl bg-surface-container-low p-6 sm:p-8 flex flex-col gap-4 text-on-surface text-sm sm:text-base leading-relaxed whitespace-pre-line shadow-inner">
+Happiest 19th birthday, Sejalll! ❤️😭🎂
+
+Bhai, 19 ki ho gayi tu, ab toh badi ho ja 😭🤚🏻😂 Anyway, I hope tera yeh year bohot achha jaaye, tujhe dher saari khushiyan milein aur jo bhi tu chahti hai, woh sab poora ho. Life mein aise hi achhi memories banti rahein . 🫶🏻💗
+
+Enjoy your day, birthday girl! Aur haan, treat dena mat bhoolna. 🤡❤️
+
+Welcome to Chapter 19! May this year be your happiest, boldest, and most deeply magical one yet. Keep glowing, keep roasting us, and never lose that superstar smile.
+
+LOVE ALWAYS,
+Your Favorite People 💖
+Forever Down Since Day 1
+              </div>
+
+              <!-- Interaction Footer Inside Card -->
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+                <div class="flex items-center gap-2 text-on-surface-variant text-xs font-medium">
+                  <span class="material-symbols-outlined text-primary text-[18px]">verified_user</span>
+                  <span>Sealed with love &amp; certified for 2025</span>
+                </div>
+                <button class="w-full sm:w-auto px-6 py-2.5 rounded-full bg-secondary-fixed hover:bg-secondary-container text-on-secondary-fixed text-xs font-bold shadow-sm transition-all flex items-center justify-center gap-2 transform active:scale-95 cursor-pointer" id="sendHugBtn" onclick="incrementHug()" type="button">
+                  <span class="material-symbols-outlined text-primary text-[18px]">favorite</span>
+                  <span>Send Hug (<span id="hugCount">142</span>)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Birthday Bumper Confetti Blast Card -->
+        <section class="w-full flex justify-center pt-2">
+          <div class="w-full rounded-3xl p-8 sm:p-12 bg-surface-container-low shadow-xl flex flex-col items-center text-center gap-8 relative overflow-hidden border border-outline-variant/30">
+            <div class="absolute -top-16 -left-16 w-52 h-52 bg-secondary-container/50 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-16 -right-16 w-52 h-52 bg-tertiary-fixed/40 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-container-lowest text-primary text-xs uppercase font-extrabold tracking-wider shadow-sm">
+              <span>💧</span>
+              <span>Team Jal Forever 💧</span>
+            </div>
+
+            <div class="flex flex-col gap-3 max-w-2xl">
+              <h2 class="text-3xl sm:text-4xl text-primary font-extrabold tracking-tight">
+                Pop the Ultimate 19th Sparkler!
+              </h2>
+              <p class="text-sm sm:text-base text-on-surface-variant">
+                Time to fill the room with digital cherries, glittering golden stars, and pink bows. Let's make Sejal's entrance into Chapter 19 unforgettable!
+              </p>
+            </div>
+
+            <button class="px-8 py-4 rounded-full bg-primary-container hover:bg-primary text-on-primary text-base sm:text-lg font-extrabold transition-all duration-200 transform hover:scale-105 shadow-xl shadow-primary-container/25 flex items-center gap-3 cursor-pointer" onclick="burstConfetti()" type="button">
+              <span class="material-symbols-outlined text-[26px]">celebration</span>
+              <span>Launch Mega Confetti Burst 🚀✨</span>
+            </button>
+
+            <!-- Milestone Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl pt-4">
+              <div class="p-5 rounded-2xl bg-surface-container-lowest shadow-sm flex flex-col items-center text-center gap-1 border border-outline-variant/20">
+                <span class="text-3xl font-extrabold text-primary">19</span>
+                <span class="text-xs text-on-surface-variant font-semibold">Candles Blazing Bright</span>
+              </div>
+              <div class="p-5 rounded-2xl bg-surface-container-lowest shadow-sm flex flex-col items-center text-center gap-1 border border-outline-variant/20">
+                <span class="text-3xl font-extrabold text-primary">100%</span>
+                <span class="text-xs text-on-surface-variant font-semibold">Main Character Energy</span>
+              </div>
+              <div class="p-5 rounded-2xl bg-surface-container-lowest shadow-sm flex flex-col items-center text-center gap-1 border border-outline-variant/20">
+                <span class="text-3xl font-extrabold text-primary">∞</span>
+                <span class="text-xs text-on-surface-variant font-semibold">Unbreakable Bond</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= POPUP MODALS ================= -->
+
+  <!-- Secret VIP Gift Modal -->
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden" id="gift-modal">
+    <div class="relative w-full max-w-md bg-surface-container-lowest rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col items-center text-center gap-5 border border-primary/20 transform transition-all scale-95" id="gift-modal-card">
+      <button class="absolute top-4 right-4 w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface hover:bg-secondary-fixed transition-colors cursor-pointer" onclick="closeGiftModal()" type="button">
+        <span class="material-symbols-outlined text-sm">close</span>
+      </button>
+
+      <div class="w-20 h-20 rounded-full bg-secondary-fixed text-primary flex items-center justify-center text-4xl shadow-md animate-bounce">
+        🎁
+      </div>
+
+      <div>
+        <span class="text-[10px] text-primary uppercase font-extrabold tracking-widest">OFFICIAL CHAPTER 19 GOLDEN TICKET</span>
+        <h3 class="text-2xl font-extrabold text-on-surface mt-1">Unlimited Birthday Privileges! 👑</h3>
+      </div>
+
+      <div class="w-full bg-surface-container-low rounded-2xl p-4 text-left flex flex-col gap-2.5 text-xs text-on-surface border border-outline-variant/40">
+        <div class="flex items-center gap-2">
+          <span>✨</span> <span class="font-bold">Treat Claim:</span> 1x Free dinner/coffee on your besties.
+        </div>
+        <div class="flex items-center gap-2">
+          <span>👑</span> <span class="font-bold">Diva Immunity:</span> Right to be 100% late for any hangout today.
+        </div>
+        <div class="flex items-center gap-2">
+          <span>💅</span> <span class="font-bold">Aux Cord Sovereignty:</span> Only Sabrina Carpenter on repeat.
+        </div>
+        <div class="flex items-center gap-2">
+          <span>❤️</span> <span class="font-bold">Forever Contract:</span> Valid for lifetime bestie rights.
+        </div>
+      </div>
+
+      <button class="w-full py-3.5 rounded-full bg-primary text-on-primary font-bold text-sm shadow-md hover:bg-primary-container transition-all cursor-pointer" onclick="closeGiftModal(); burstConfetti();" type="button">
+        Claim Birthday Privileges! 💖
+      </button>
+    </div>
+  </div>
+
+  <!-- Cake Wish Ceremony Accomplished Modal -->
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden" id="wish-modal">
+    <div class="relative w-full max-w-md bg-surface-container-lowest rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col items-center text-center gap-5 border border-primary/20 transform transition-all scale-95" id="wish-modal-card">
+      <button class="absolute top-4 right-4 w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface hover:bg-secondary-fixed transition-colors cursor-pointer" onclick="closeWishModal()" type="button">
+        <span class="material-symbols-outlined text-sm">close</span>
+      </button>
+
+      <div class="w-20 h-20 rounded-full bg-tertiary-fixed text-tertiary flex items-center justify-center text-4xl shadow-md animate-pulse">
+        🌟
+      </div>
+
+      <div>
+        <span class="text-[10px] text-tertiary uppercase font-extrabold tracking-widest">CHAPTER 19 UNLOCKED</span>
+        <h3 class="text-2xl font-extrabold text-primary mt-1">All 19 Candles Blown Out! 🎂💨</h3>
+      </div>
+
+      <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
+        Your 19th birthday wish has been launched into the universe! May this year bring you limitless smiles, unforgettable adventures, and every dream fulfilled.
+      </p>
+
+      <button class="w-full py-3.5 rounded-full bg-primary-container text-on-primary font-bold text-sm shadow-md hover:bg-primary transition-all cursor-pointer" onclick="closeWishModal(); navigateTo('secret-gift-and-wishes');" type="button">
+        Go to Secret Gift &amp; Letter 💌
+      </button>
+    </div>
+  </div>
+
+  <!-- Shared Footer -->
+  <footer class="w-full py-8 text-center bg-surface-container-lowest border-t border-outline-variant/30 text-xs text-on-surface-variant flex flex-col items-center gap-1.5">
+    <p class="font-bold text-primary">Made with endless love for Sejal • Chapter 19 🎂💖</p>
+    <p>19 Years of Sass, Drama &amp; Unstoppable Magic • 2025</p>
+  </footer>
+
+  <!-- ================= MASTER CONTROLLER SCRIPT ================= -->
+  <script>
+    /* ----------------------------------------------------
+       1. MULTI-PAGE VIEW ROUTING (Preserves Audio Playback)
+    ---------------------------------------------------- */
+    const views = ['memory-vault', 'the-roast-zone', 'candle-blowout-cake', 'secret-gift-and-wishes'];
+    
+    function navigateTo(targetId) {
+      if (!views.includes(targetId)) targetId = 'memory-vault';
+
+      views.forEach(id => {
+        const el = document.getElementById('view-' + id);
+        if (el) {
+          if (id === targetId) {
+            el.classList.add('active');
+          } else {
+            el.classList.remove('active');
+          }
+        }
+      });
+
+      // Desktop Nav Pill Highlight
+      document.querySelectorAll('#main-nav .nav-btn').forEach(btn => {
+        const target = btn.getAttribute('data-target');
+        if (target === targetId) {
+          btn.className = 'nav-btn px-4 py-2 rounded-full text-xs font-bold transition-all bg-primary-container text-on-primary-container shadow-[0_2px_10px_rgba(222,27,68,0.25)] cursor-pointer';
+        } else {
+          btn.className = 'nav-btn px-4 py-2 rounded-full text-xs font-semibold transition-all text-on-surface-variant hover:text-primary cursor-pointer';
+        }
+      });
+
+      // Mobile Bottom Bar Highlight
+      document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+        const target = btn.getAttribute('data-target');
+        if (target === targetId) {
+          btn.classList.add('bg-primary-container', 'text-on-primary-container', 'shadow-sm');
+          btn.classList.remove('text-on-surface-variant');
+        } else {
+          btn.classList.remove('bg-primary-container', 'text-on-primary-container', 'shadow-sm');
+          btn.classList.add('text-on-surface-variant');
+        }
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    navigateTo('memory-vault');
+
+    /* ----------------------------------------------------
+       2. BACKGROUND AUDIO CONTROLLER
+    ---------------------------------------------------- */
+    const audio = document.getElementById('birthday-audio');
+
+    function updateAudioUI(isPlaying) {
+      const headerIcon = document.getElementById('header-audio-icon');
+      const headerLabel = document.getElementById('header-audio-label');
+      const miniIcon = document.getElementById('mini-audio-icon');
+      const vinylDisc = document.getElementById('vinyl-disc');
+      const floatingStatus = document.getElementById('floating-audio-status');
+      const bannerLabel = document.getElementById('audio-btn-label');
+
+      if (isPlaying) {
+        if (headerIcon) headerIcon.textContent = 'pause';
+        if (headerLabel) headerLabel.textContent = 'Playing';
+        if (miniIcon) miniIcon.textContent = 'pause';
+        if (vinylDisc) vinylDisc.classList.add('spinning-disc');
+        if (floatingStatus) floatingStatus.textContent = 'Playing 💖 (Tap to pause)';
+        if (bannerLabel) bannerLabel.textContent = 'Pause Music';
+
+        document.querySelectorAll('#floating-eq span, #header-eq span, #banner-eq span, #card-eq span').forEach((b, i) => {
+          b.classList.add('animate-pulse');
+          b.style.height = (8 + (i % 3) * 6) + 'px';
+        });
+      } else {
+        if (headerIcon) headerIcon.textContent = 'play_arrow';
+        if (headerLabel) headerLabel.textContent = 'Music';
+        if (miniIcon) miniIcon.textContent = 'play_arrow';
+        if (vinylDisc) vinylDisc.classList.remove('spinning-disc');
+        if (floatingStatus) floatingStatus.textContent = 'Paused (Tap to play)';
+        if (bannerLabel) bannerLabel.textContent = 'Vibe Along';
+
+        document.querySelectorAll('#floating-eq span, #header-eq span, #banner-eq span, #card-eq span').forEach(b => {
+          b.classList.remove('animate-pulse');
+        });
+      }
+    }
+
+    function toggleAudio() {
+      if (audio.paused) {
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            updateAudioUI(true);
+            showToast('🎶 Music playing! Enjoy Chapter 19!');
+          }).catch(err => {
+            console.error("Playback error:", err);
+            showToast('⚠️ Tap once more to allow audio!');
+          });
+        }
+      } else {
+        audio.pause();
+        updateAudioUI(false);
+      }
+    }
+
+    audio.addEventListener('play', () => updateAudioUI(true));
+    audio.addEventListener('pause', () => updateAudioUI(false));
+    audio.addEventListener('ended', () => updateAudioUI(false));
+
+    /* ----------------------------------------------------
+       3. FULL-SCREEN CONFETTI CANNON
+    ---------------------------------------------------- */
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    let confettiList = [];
+    let isConfettiRunning = false;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function burstConfetti() {
+      const colors = ['#b50032', '#de1b44', '#fdb2c5', '#ffdf90', '#ffd9e1', '#ffffff'];
+      for (let i = 0; i < 90; i++) {
+        confettiList.push({
+          x: window.innerWidth / 2,
+          y: window.innerHeight / 2,
+          w: Math.random() * 9 + 4,
+          h: Math.random() * 6 + 4,
+          vx: (Math.random() - 0.5) * 18,
+          vy: (Math.random() - 0.7) * 20,
+          rot: Math.random() * 360,
+          rotSpeed: (Math.random() - 0.5) * 12,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          alpha: 1,
+          decay: Math.random() * 0.012 + 0.008
+        });
+      }
+      if (!isConfettiRunning) {
+        isConfettiRunning = true;
+        renderConfetti();
+      }
+    }
+
+    function renderConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = confettiList.length - 1; i >= 0; i--) {
+        const p = confettiList[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.35;
+        p.rot += p.rotSpeed;
+        p.alpha -= p.decay;
+
+        if (p.alpha <= 0) {
+          confettiList.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.rot * Math.PI) / 180);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      }
+
+      if (confettiList.length > 0) {
+        requestAnimationFrame(renderConfetti);
+      } else {
+        isConfettiRunning = false;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    /* ----------------------------------------------------
+       4. PAGE 1: GUESTBOOK
+    ---------------------------------------------------- */
+    function addGuestNote(e) {
+      e.preventDefault();
+      const nameInput = document.getElementById('guest-name');
+      const msgInput = document.getElementById('guest-message');
+      const container = document.getElementById('notes-container');
+
+      const card = document.createElement('div');
+      card.className = 'p-4 rounded-xl bg-surface-container-lowest shadow-sm border border-outline-variant/20 flex flex-col justify-between transform transition-all duration-300 scale-95';
+      card.innerHTML = `
+        <p class="text-sm italic text-on-surface">“${msgInput.value}”</p>
+        <span class="text-xs text-primary font-bold mt-3">— ${nameInput.value}</span>
+      `;
+      container.prepend(card);
+      setTimeout(() => card.classList.remove('scale-95'), 50);
+
+      burstConfetti();
+      showToast('💌 Note pinned for Sejal!');
+      nameInput.value = '';
+      msgInput.value = '';
+    }
+
+    /* ----------------------------------------------------
+       5. PAGE 2: ROAST ZONE INTERACTIONS
+    ---------------------------------------------------- */
+    let roastVal = 88;
+    function throwTomato() {
+      roastVal = Math.min(100, roastVal + 3);
+      document.getElementById('roastometer-value').textContent = roastVal + '%';
+      document.getElementById('roastometer-bar').style.width = roastVal + '%';
+
+      const splash = document.createElement('div');
+      splash.className = 'fixed z-50 pointer-events-none text-7xl';
+      splash.style.left = (Math.random() * 60 + 20) + 'vw';
+      splash.style.top = (Math.random() * 50 + 20) + 'vh';
+      splash.style.animation = 'tomatoSplatter 0.8s ease-out forwards';
+      splash.textContent = '🍅💥';
+      document.body.appendChild(splash);
+      setTimeout(() => splash.remove(), 800);
+
+      showToast('🍅 Tomato splattered! Damage index: ' + roastVal + '%');
+    }
+
+    function likeRoast(btn) {
+      const counter = btn.querySelector('.like-count');
+      let val = parseInt(counter.textContent, 10);
+      counter.textContent = val + 1;
+      btn.classList.add('text-primary');
+      burstConfetti();
+    }
+
+    /* ----------------------------------------------------
+       6. PAGE 3: 19 CANDLES & FLAVOR CUSTOMIZATION
+    ---------------------------------------------------- */
+    const candlesRow = document.getElementById('candles-row');
+    const totalCandles = 19;
+    let blownOutState = Array(totalCandles).fill(false);
+    let slicesCount = 42;
+
+    function buildCandles() {
+      candlesRow.innerHTML = '';
+      for (let i = 0; i < totalCandles; i++) {
+        const height = 12 + (i % 4) * 2;
+        const candle = document.createElement('button');
+        candle.type = 'button';
+        candle.setAttribute('aria-label', 'Candle ' + (i + 1));
+        candle.className = 'group flex flex-col items-center focus:outline-none transition-transform hover:scale-125 cursor-pointer';
+        candle.id = 'candle-' + i;
+        candle.onclick = () => blowCandle(i);
+
+        candle.innerHTML = `
+          <div class="flame w-3 sm:w-3.5 h-5 sm:h-6 bg-gradient-to-t from-amber-500 via-yellow-300 to-white rounded-full blur-[0.5px] shadow-[0_0_12px_#ffbf00] animate-pulse flame-active" id="flame-${i}"></div>
+          <div class="smoke hidden w-1.5 h-4 bg-outline-variant/60 rounded-full blur-[1px]" id="smoke-${i}"></div>
+          <div class="wick w-0.5 h-1.5 bg-on-surface"></div>
+          <div class="stick w-1.5 sm:w-2.5 h-${height} rounded-t-sm bg-gradient-to-b from-secondary-container to-primary shadow-sm"></div>
+        `;
+        candlesRow.appendChild(candle);
+      }
+    }
+    buildCandles();
+
+    function blowCandle(index) {
+      if (!blownOutState[index]) {
+        blownOutState[index] = true;
+        const flame = document.getElementById('flame-' + index);
+        const smoke = document.getElementById('smoke-' + index);
+
+        if (flame) flame.classList.add('flame-extinguished');
+        if (smoke) smoke.classList.add('smoke-active');
+
+        updateCandleProgress();
+      }
+    }
+
+    function blowAllCandles() {
+      for (let i = 0; i < totalCandles; i++) {
+        blownOutState[i] = true;
+        const flame = document.getElementById('flame-' + i);
+        const smoke = document.getElementById('smoke-' + i);
+        if (flame) flame.classList.add('flame-extinguished');
+        if (smoke) smoke.classList.add('smoke-active');
+      }
+      updateCandleProgress();
+    }
+
+    function resetCandles() {
+      blownOutState = Array(totalCandles).fill(false);
+      for (let i = 0; i < totalCandles; i++) {
+        const flame = document.getElementById('flame-' + i);
+        const smoke = document.getElementById('smoke-' + i);
+        if (flame) flame.classList.remove('flame-extinguished');
+        if (smoke) smoke.classList.remove('smoke-active');
+      }
+      updateCandleProgress();
+      showToast('🔥 Candles reignited for more wishes!');
+    }
+
+    function updateCandleProgress() {
+      const blownCount = blownOutState.filter(Boolean).length;
+      document.getElementById('candle-count-text').textContent = `${blownCount} of 19 Blown Out`;
+      const pct = (blownCount / totalCandles) * 100;
+      document.getElementById('candle-progress-fill').style.width = pct + '%';
+
+      if (blownCount === 19) {
+        burstConfetti();
+        openWishModal();
+      }
+    }
+
+    function cutSlice() {
+      slicesCount++;
+      document.getElementById('slices-counter').textContent = slicesCount + ' Slices cut';
+      burstConfetti();
+      showToast('🍰 Fresh slice served for Chapter 19!');
+    }
+
+    function setCakeFlavor(flavor) {
+      document.querySelectorAll('.flavor-btn').forEach(btn => {
+        btn.className = 'flavor-btn px-5 py-2 rounded-full text-xs font-bold transition-all shadow-sm flex items-center gap-2 bg-surface-container-high text-on-surface-variant hover:bg-secondary-fixed';
+      });
+      const activeBtn = document.getElementById('flavor-' + flavor);
+      if (activeBtn) activeBtn.className = 'flavor-btn px-5 py-2 rounded-full text-xs font-bold transition-all shadow-sm flex items-center gap-2 bg-primary-container text-on-primary-container scale-105';
+
+      const tier1 = document.getElementById('cake-tier-1');
+      const tier2 = document.getElementById('cake-tier-2');
+      const tier3 = document.getElementById('cake-tier-3');
+
+      if (flavor === 'berry') {
+        tier1.style.backgroundColor = '#ffd9e1';
+        tier2.style.backgroundColor = '#fdb2c5';
+        tier3.style.backgroundColor = '#fdb2c5';
+      } else if (flavor === 'velvet') {
+        tier1.style.backgroundColor = '#e5bdbd';
+        tier2.style.backgroundColor = '#de1b44';
+        tier3.style.backgroundColor = '#b50032';
+      } else if (flavor === 'mocha') {
+        tier1.style.backgroundColor = '#ffdf90';
+        tier2.style.backgroundColor = '#d2a501';
+        tier3.style.backgroundColor = '#755b00';
+      }
+      showToast(`🎂 Cake flavor switched to ${flavor.toUpperCase()}!`);
+    }
+
+    /* ----------------------------------------------------
+       7. PAGE 4: VIP GIFT & HUGS
+    ---------------------------------------------------- */
+    let hugCount = 142;
+    function incrementHug() {
+      hugCount++;
+      document.getElementById('hugCount').textContent = hugCount;
+      burstConfetti();
+      showToast('❤️ Huge warm hug sent to Sejal!');
+    }
+
+    function openGiftModal() {
+      burstConfetti();
+      const modal = document.getElementById('gift-modal');
+      const card = document.getElementById('gift-modal-card');
+      modal.classList.remove('hidden');
+      setTimeout(() => card.classList.remove('scale-95'), 10);
+    }
+
+    function closeGiftModal() {
+      const modal = document.getElementById('gift-modal');
+      const card = document.getElementById('gift-modal-card');
+      card.classList.add('scale-95');
+      setTimeout(() => modal.classList.add('hidden'), 150);
+    }
+
+    function openWishModal() {
+      const modal = document.getElementById('wish-modal');
+      const card = document.getElementById('wish-modal-card');
+      modal.classList.remove('hidden');
+      setTimeout(() => card.classList.remove('scale-95'), 10);
+    }
+
+    function closeWishModal() {
+      const modal = document.getElementById('wish-modal');
+      const card = document.getElementById('wish-modal-card');
+      card.classList.add('scale-95');
+      setTimeout(() => modal.classList.add('hidden'), 150);
+    }
+
+    /* ----------------------------------------------------
+       8. TOAST NOTIFICATION UTILITY
+    ---------------------------------------------------- */
+    function showToast(message) {
+      const shelf = document.getElementById('toast-shelf');
+      const toast = document.createElement('div');
+      toast.className = 'px-4 py-2.5 rounded-full bg-on-surface text-surface text-xs font-bold shadow-lg pointer-events-auto transform transition-all duration-300 translate-y-2 opacity-0 flex items-center gap-2';
+      toast.innerHTML = `<span>✨</span><span>${message}</span>`;
+      shelf.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 2600);
+    }
+  </script>
+</body>
+</html>
